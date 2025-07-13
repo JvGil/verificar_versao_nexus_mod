@@ -1,6 +1,8 @@
 import re
 
 from api import client, endpoints
+from api.parametros import JOGOS
+from config import PATH_JOGO
 
 
 def obter_nome_versao(mod, versao):
@@ -12,13 +14,14 @@ def obter_nome_versao(mod, versao):
     }
 
 
-def executar_processamento(lista_mods: dict):
+def executar_processamento(nome_jogo):
     mods = []
+    lista_mods = JOGOS.get(nome_jogo)
     for mod_id, versao in lista_mods.items():
-        mod = processar_mod('eldenring', mod_id, versao)
+        mod = processar_mod(nome_jogo, mod_id, versao)
         if mod:
             mods.append(mod)
-            return mods
+    return mods
 
 
 def processar_mod(nome_jogo, mod_id, versao):
@@ -57,18 +60,25 @@ def atualizar_versao_moasg(lista_arquivos, mod):
     return mod
 
 
-def retornar_mensagem(mods):
+def retornar_mensagem(mods: list, nome_jogo):
     if mods:
-        print("Os seguintes mods estão desatualizados:")
+        print(f"Existem {mods.__len__()} mods desatualizados.\n"
+              f"Os seguintes mods estão desatualizados:")
+        print('-' * 79)
         for mod in mods:
             url_complemento = f"{mod['mod_id']}?tab=files"
-            url = f"https://www.nexusmods.com/eldenring/mods/{url_complemento}"
+            url = f"https://www.nexusmods.com/{nome_jogo}/mods/{url_complemento}"
             print(
                 f"Nome:          {mod['nome']} - {mod['mod_id']}\n"
                 f"Versão Online: {mod['versao_online']}\n"
                 f"Versão Local:  {mod['versao_local']}\n"
                 f"url:           {url}"
             )
-            print('-' * 70)
+            print('-' * 79)
+        caminho_jogo = PATH_JOGO.get(nome_jogo)
+        if caminho_jogo:
+            caminho_jogo = caminho_jogo.replace('\\', '/')  # troca barras invertidas por barras normais
+            caminho_codificado = re.sub(r' ', '%20', caminho_jogo)  # apenas espaços codificados
+            print(f'file:///{caminho_codificado}')
     else:
-        print("Todos os mods estão atualizados")
+            print("Todos os mods estão atualizados")

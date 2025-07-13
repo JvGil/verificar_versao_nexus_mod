@@ -1,7 +1,6 @@
 import logging
 import time
 
-from api import parametros
 from processing.processor import retornar_mensagem, executar_processamento
 from utils.utils import setup_logging, log_error
 
@@ -10,10 +9,11 @@ def main():
     setup_logging()
     start_time = time.time()
     logging.info("Início da execução")
+    nome_jogo = 'eldenring'
 
     try:
-        mods = executar_processamento(parametros.MOD_ER)
-        retornar_mensagem(mods)
+        mods = executar_processamento(nome_jogo)
+        retornar_mensagem(mods, nome_jogo)
     except Exception as e:
         log_error(f"Erro ao processar dados: {e}")
 
